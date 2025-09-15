@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Портфолио - Haku-one</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            border-bottom: 1px solid #333;
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        .nav-item {
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        
+        .nav-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #667eea;
+        }
+        
+        .nav-item.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            margin-top: 80px;
+        }
+        
+        /* Page transitions */
+        .page {
+            min-height: calc(100vh - 80px);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Home Page */
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: calc(100vh - 80px);
+            gap: 4rem;
+        }
+        
+        .hero-content {
+            flex: 1;
+        }
+        
+        .hero-title {
+            font-size: 4rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { filter: brightness(1); }
+            to { filter: brightness(1.2); }
+        }
+        
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: #888;
+            margin-bottom: 2rem;
+        }
+        
+        .hero-description {
+            font-size: 1.1rem;
+            color: #ccc;
+            margin-bottom: 3rem;
+            line-height: 1.8;
+        }
+        
+        .hero-visual {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .code-animation {
+            background: #1e1e1e;
+            border-radius: 15px;
+            padding: 2rem;
+            font-family: 'Courier New', monospace;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        
+        .code-line {
+            margin-bottom: 0.5rem;
+            opacity: 0;
+            animation: typeWriter 0.5s ease forwards;
+        }
+        
+        .code-line:nth-child(1) { animation-delay: 0.5s; }
+        .code-line:nth-child(2) { animation-delay: 1s; }
+        .code-line:nth-child(3) { animation-delay: 1.5s; }
+        .code-line:nth-child(4) { animation-delay: 2s; }
+        
+        @keyframes typeWriter {
+            to { opacity: 1; }
+        }
+        
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+        
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-right: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #667eea;
+        }
+        
+        .btn-outline:hover {
+            background: #667eea;
+        }
+        
+        /* About Page */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            margin-top: 4rem;
+        }
+        
+        .about-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #ccc;
+        }
+        
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .skill-card {
+            background: linear-gradient(135deg, #1e1e1e, #2d2d2d);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid #333;
+        }
+        
+        .skill-card:hover {
+            transform: translateY(-10px);
+            border-color: #667eea;
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
+        }
+        
+        .skill-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .skill-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .skill-level {
+            color: #888;
+        }
+        
+        /* Projects Page */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+        
+        .project-card {
+            background: linear-gradient(135deg, #1e1e1e, #2d2d2d);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid #333;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+        }
+        
+        .project-image {
+            height: 200px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+        
+        .project-content {
+            padding: 2rem;
+        }
+        
+        .project-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+        
+        .project-description {
+            color: #ccc;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        
+        .project-tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .tech-tag {
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            border: 1px solid #667eea;
+        }
+        
+        /* Contact Page */
+        .contact-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            margin-top: 4rem;
+        }
+        
+        .contact-form {
+            background: linear-gradient(135deg, #1e1e1e, #2d2d2d);
+            padding: 3rem;
+            border-radius: 15px;
+            border: 1px solid #333;
+        }
+        
+        .form-group {
+            margin-bottom: 2rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #ccc;
+            font-weight: 500;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #1e1e1e, #2d2d2d);
+            border-radius: 15px;
+            border: 1px solid #333;
+            transition: all 0.3s ease;
+        }
+        
+        .contact-item:hover {
+            border-color: #667eea;
+            transform: translateX(10px);
+        }
+        
+        .contact-icon {
+            font-size: 2rem;
+            color: #667eea;
+        }
+        
+        .contact-text {
+            flex: 1;
+        }
+        
+        .contact-title {
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+        
+        .contact-value {
+            color: #888;
+        }
+        
+        /* Page Headers */
+        .page-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .page-title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .page-subtitle {
+            font-size: 1.2rem;
+            color: #888;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+            
+            .hero {
+                flex-direction: column;
+                text-align: center;
+                gap: 2rem;
+            }
+            
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .about-grid,
+            .contact-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .container {
+                padding: 0 1rem;
+            }
+        }
+        
+        /* Loading animation */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #333;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Navigation Component
+        function Navigation({ currentPage, setCurrentPage }) {
+            const menuItems = [
+                { id: 'home', name: 'Главная', icon: '🏠' },
+                { id: 'about', name: 'О себе', icon: '👨‍💻' },
+                { id: 'projects', name: 'Проекты', icon: '🚀' },
+                { id: 'contact', name: 'Контакты', icon: '📧' }
+            ];
+
+            return (
+                <nav className="navbar">
+                    <div className="nav-container">
+                        <div className="logo">Haku-one</div>
+                        <ul className="nav-menu">
+                            {menuItems.map(item => (
+                                <li 
+                                    key={item.id}
+                                    className={`nav-item ${currentPage === item.id ? 'active' : ''}`}
+                                    onClick={() => setCurrentPage(item.id)}
+                                >
+                                    {item.icon} {item.name}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </nav>
+            );
+        }
+
+        // Home Page Component
+        function HomePage() {
+            return (
+                <div className="page">
+                    <div className="hero">
+                        <div className="hero-content">
+                            <h1 className="hero-title">Haku-one</h1>
+                            <p className="hero-subtitle">Fullstack Developer & Open Source Enthusiast</p>
+                            <p className="hero-description">
+                                Привет! Я разработчик, который создает современные веб-приложения 
+                                с использованием React, Next.js, Node.js и других технологий. 
+                                Люблю изучать новые технологии и делиться знаниями с сообществом.
+                            </p>
+                            <button className="btn">Посмотреть проекты</button>
+                            <button className="btn btn-outline">Связаться</button>
+                        </div>
+                        <div className="hero-visual">
+                            <div className="code-animation">
+                                <div className="code-line">
+                                    <span className="keyword">const</span> <span className="string">developer</span> = {
+                                </div>
+                                <div className="code-line">
+                                    &nbsp;&nbsp;<span className="string">name</span>: <span className="string">'Haku-one'</span>,
+                                </div>
+                                <div className="code-line">
+                                    &nbsp;&nbsp;<span className="string">skills</span>: [<span className="string">'React'</span>, <span className="string">'Next.js'</span>],
+                                </div>
+                                <div className="code-line">
+                                    &nbsp;&nbsp;<span className="string">passion</span>: <span className="string">'coding'</span>
+                                </div>
+                                <div className="code-line">};</div>
+                                <div className="code-line">
+                                    <span className="comment">// Создаю крутые проекты! 🚀</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // About Page Component
+        function AboutPage() {
+            const skills = [
+                { name: 'React', level: 'Продвинутый', icon: '⚛️' },
+                { name: 'Next.js', level: 'Продвинутый', icon: '🔼' },
+                { name: 'JavaScript', level: 'Эксперт', icon: '🟨' },
+                { name: 'TypeScript', level: 'Продвинутый', icon: '🔷' },
+                { name: 'Node.js', level: 'Средний', icon: '🟢' },
+                { name: 'Git', level: 'Продвинутый', icon: '📚' }
+            ];
+
+            return (
+                <div className="page">
+                    <div className="page-header">
+                        <h1 className="page-title">О себе</h1>
+                        <p className="page-subtitle">
+                            Узнайте больше обо мне, моих навыках и опыте разработки
+                        </p>
+                    </div>
+
+                    <div className="about-grid">
+                        <div>
+                            <h2 style={{marginBottom: '2rem', color: '#fff'}}>Моя история</h2>
+                            <p className="about-text">
+                                Привет! Меня зовут Haku-one, и я увлеченный разработчик с опытом 
+                                создания современных веб-приложений. Моя история в программировании 
+                                началась несколько лет назад, и с тех пор я постоянно изучаю новые 
+                                технологии и совершенствую свои навыки.
+                            </p>
+                            <br />
+                            <p className="about-text">
+                                Я специализируюсь на фронтенд-разработке с использованием React и Next.js, 
+                                но также имею опыт работы с бэкенд-технологиями. Люблю создавать 
+                                интуитивные пользовательские интерфейсы и решать сложные технические задачи.
+                            </p>
+                        </div>
+                        <div>
+                            <h2 style={{marginBottom: '2rem', color: '#fff'}}>Интересы</h2>
+                            <p className="about-text">
+                                Помимо программирования, я увлекаюсь:
+                            </p>
+                            <ul style={{color: '#ccc', marginTop: '1rem', paddingLeft: '2rem'}}>
+                                <li>Open Source проектами</li>
+                                <li>Изучением новых технологий</li>
+                                <li>Написанием технических статей</li>
+                                <li>Участием в IT-сообществе</li>
+                                <li>Созданием полезных инструментов</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h2 style={{marginTop: '4rem', marginBottom: '2rem', textAlign: 'center', color: '#fff'}}>
+                        Мои навыки
+                    </h2>
+                    <div className="skills-grid">
+                        {skills.map((skill, index) => (
+                            <div key={index} className="skill-card">
+                                <div className="skill-icon">{skill.icon}</div>
+                                <div className="skill-name">{skill.name}</div>
+                                <div className="skill-level">{skill.level}</div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        // Projects Page Component
+        function ProjectsPage() {
+            const projects = [
+                {
+                    id: 1,
+                    name: 'FOG',
+                    description: 'Современное веб-приложение с красивым интерфейсом и продвинутой функциональностью. Включает в себя адаптивный дизайн и оптимизацию производительности.',
+                    icon: '🌫️',
+                    tech: ['React', 'Next.js', 'CSS3'],
+                    github: 'https://github.com/Haku-one/fog'
+                },
+                {
+                    id: 2,
+                    name: 'Gallery',
+                    description: 'Интерактивная галерея изображений с возможностью загрузки, просмотра и организации фотографий. Поддерживает различные форматы и имеет удобную навигацию.',
+                    icon: '🖼️',
+                    tech: ['JavaScript', 'HTML5', 'CSS3'],
+                    github: 'https://github.com/Haku-one/gallery'
+                },
+                {
+                    id: 3,
+                    name: 'СДЭК V2',
+                    description: 'Обновленная версия интеграции с API СДЭК для расчета стоимости доставки и отслеживания посылок. Включает новые функции и улучшенную производительность.',
+                    icon: '📦',
+                    tech: ['Node.js', 'API', 'JavaScript'],
+                    github: 'https://github.com/Haku-one/sdek-v-2'
+                },
+                {
+                    id: 4,
+                    name: 'СДЭК',
+                    description: 'Первая версия интеграции с сервисом доставки СДЭК. Позволяет рассчитывать стоимость доставки и получать информацию о статусе отправлений.',
+                    icon: '🚚',
+                    tech: ['JavaScript', 'API'],
+                    github: 'https://github.com/Haku-one/sdek'
+                },
+                {
+                    id: 5,
+                    name: 'My First Pull Request',
+                    description: 'Обучающий проект для новичков в Git и GitHub. Помогает понять основы работы с версионным контролем и создания pull request-ов.',
+                    icon: '🔀',
+                    tech: ['Git', 'GitHub', 'Markdown'],
+                    github: 'https://github.com/Haku-one/ru-my-first-pullrequest'
+                },
+                {
+                    id: 6,
+                    name: 'Портфолио',
+                    description: 'Этот сайт-портфолио, созданный с использованием React компонентов и современных веб-технологий. Полностью адаптивный и интерактивный.',
+                    icon: '💼',
+                    tech: ['React', 'CSS3', 'JavaScript'],
+                    github: '#'
+                }
+            ];
+
+            return (
+                <div className="page">
+                    <div className="page-header">
+                        <h1 className="page-title">Мои проекты</h1>
+                        <p className="page-subtitle">
+                            Коллекция моих работ и проектов, над которыми я работал
+                        </p>
+                    </div>
+
+                    <div className="projects-grid">
+                        {projects.map(project => (
+                            <div key={project.id} className="project-card">
+                                <div className="project-image">
+                                    {project.icon}
+                                </div>
+                                <div className="project-content">
+                                    <h3 className="project-title">{project.name}</h3>
+                                    <p className="project-description">{project.description}</p>
+                                    <div className="project-tech">
+                                        {project.tech.map((tech, index) => (
+                                            <span key={index} className="tech-tag">{tech}</span>
+                                        ))}
+                                    </div>
+                                    <button 
+                                        className="btn"
+                                        onClick={() => window.open(project.github, '_blank')}
+                                    >
+                                        Посмотреть на GitHub
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        // Contact Page Component
+        function ContactPage() {
+            const [formData, setFormData] = useState({
+                name: '',
+                email: '',
+                message: ''
+            });
+
+            const handleInputChange = (e) => {
+                setFormData({
+                    ...formData,
+                    [e.target.name]: e.target.value
+                });
+            };
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                alert('Спасибо за сообщение! В реальном проекте здесь была бы отправка на сервер.');
+                setFormData({ name: '', email: '', message: '' });
+            };
+
+            return (
+                <div className="page">
+                    <div className="page-header">
+                        <h1 className="page-title">Связаться со мной</h1>
+                        <p className="page-subtitle">
+                            Есть вопросы или предложения? Буду рад пообщаться!
+                        </p>
+                    </div>
+
+                    <div className="contact-container">
+                        <form className="contact-form" onSubmit={handleSubmit}>
+                            <h3 style={{marginBottom: '2rem', color: '#fff'}}>Отправить сообщение</h3>
+                            
+                            <div className="form-group">
+                                <label className="form-label">Ваше имя</label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleInputChange}
+                                    className="form-input"
+                                    required
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label className="form-label">Email</label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    className="form-input"
+                                    required
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label className="form-label">Сообщение</label>
+                                <textarea
+                                    name="message"
+                                    value={formData.message}
+                                    onChange={handleInputChange}
+                                    className="form-input form-textarea"
+                                    required
+                                ></textarea>
+                            </div>
+
+                            <button type="submit" className="btn">
+                                Отправить сообщение
+                            </button>
+                        </form>
+
+                        <div className="contact-info">
+                            <div className="contact-item">
+                                <div className="contact-icon">📧</div>
+                                <div className="contact-text">
+                                    <div className="contact-title">Email</div>
+                                    <div className="contact-value">haku.one@example.com</div>
+                                </div>
+                            </div>
+
+                            <div className="contact-item">
+                                <div className="contact-icon">📱</div>
+                                <div className="contact-text">
+                                    <div className="contact-title">Telegram</div>
+                                    <div className="contact-value">@HakuOne</div>
+                                </div>
+                            </div>
+
+                            <div className="contact-item">
+                                <div className="contact-icon">💼</div>
+                                <div className="contact-text">
+                                    <div className="contact-title">GitHub</div>
+                                    <div className="contact-value">github.com/Haku-one</div>
+                                </div>
+                            </div>
+
+                            <div className="contact-item">
+                                <div className="contact-icon">🌍</div>
+                                <div className="contact-text">
+                                    <div className="contact-title">Локация</div>
+                                    <div className="contact-value">Россия</div>
+                                </div>
+                            </div>
+
+                            <div className="contact-item">
+                                <div className="contact-icon">⏰</div>
+                                <div className="contact-text">
+                                    <div className="contact-title">Время ответа</div>
+                                    <div className="contact-value">Обычно в течение 24 часов</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Main App Component
+        function App() {
+            const [currentPage, setCurrentPage] = useState('home');
+            const [loading, setLoading] = useState(false);
+
+            // Simulate page loading
+            useEffect(() => {
+                setLoading(true);
+                const timer = setTimeout(() => {
+                    setLoading(false);
+                }, 300);
+                return () => clearTimeout(timer);
+            }, [currentPage]);
+
+            const renderPage = () => {
+                if (loading) {
+                    return (
+                        <div className="loading">
+                            <div className="spinner"></div>
+                        </div>
+                    );
+                }
+
+                switch(currentPage) {
+                    case 'home':
+                        return <HomePage />;
+                    case 'about':
+                        return <AboutPage />;
+                    case 'projects':
+                        return <ProjectsPage />;
+                    case 'contact':
+                        return <ContactPage />;
+                    default:
+                        return <HomePage />;
+                }
+            };
+
+            return (
+                <div>
+                    <Navigation currentPage={currentPage} setCurrentPage={setCurrentPage} />
+                    <div className="container">
+                        {renderPage()}
+                    </div>
+                </div>
+            );
+        }
+
+        // Render the app
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
